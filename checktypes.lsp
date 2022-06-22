@@ -1,0 +1,20 @@
+(defun checktypes()
+	;(if (= (get_tile "geometry") "Geometry Parameters"))
+	(if (not (and (distof (get_tile "H")) (distof (get_tile "H0")) (distof (get_tile "b"))))
+		(set_tile "error" "ERROR: Please enter a real value for the deployed height, folded height and polygon edge length")
+		(progn
+			(if (numtxt (get_tile "n"))
+				(progn
+					(if (> (abs (- (expt (distof (get_tile "H")) 2) (expt (distof (get_tile "H0")) 2))) (expt (cot (/ pi (atoi (get_tile "n")))) 2))
+					    (progn
+					       (set_tile "error" "ERROR: Your parameters have failed to meet the design constraint |H^2 - H0^2| <= cot^2(pi/n)")
+					    )
+					    (done_dialog)
+					)
+				)
+				(set_tile "error" "ERROR: Please enter an integer value for the number of polygon edges")
+			)
+		)
+	)
+)
+(princ)

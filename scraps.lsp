@@ -1,5 +1,0 @@
-((= response "Y") (setq layers T) (setq bad_res nil)) 
-		((= response "y") (setq layers T) (setq bad_res nil))  
-		((= response "N") (setq layers nil) (setq bad_res nil))  
-		((= response "n") (setq layers nil) (setq bad_res nil)) 
-		(T (print "Invalid response, please type Y, y, N, or n")) 
