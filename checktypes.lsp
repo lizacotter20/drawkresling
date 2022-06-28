@@ -9,7 +9,12 @@
 					    (progn
 					       (set_tile "error" "ERROR: Your parameters have failed to meet the design constraint |H^2 - H0^2| <= cot^2(pi/n)")
 					    )
-					    (done_dialog)
+					    (progn
+					    	(if (< (atoi (get_tile "n")) 4)
+					    		(set_tile "error" "ERROR: n has to be greater than or equal to 4")
+					    		(done_dialog)
+					    	)
+					    )
 					)
 				)
 				(set_tile "error" "ERROR: Please enter an integer value for the number of polygon edges")

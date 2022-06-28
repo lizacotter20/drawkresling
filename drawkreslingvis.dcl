@@ -48,6 +48,7 @@ drawkreslingvis : dialog { label = "Draw Kresling";
 				alignment = right;
 				edit_limit = 10;
 				edit_width = 10;
+				value = 0;
 
 			}
 			: edit_box {
@@ -56,36 +57,33 @@ drawkreslingvis : dialog { label = "Draw Kresling";
 				alignment = right;
 				edit_limit = 10;
 				edit_width = 10;
+				value = 0;
 
 			}
 		}
 		// want to make this on the right side of the box
-		: toggle {
-			key = "select";
-			label = "Or select a point on screen";
+		: button {
+			key = "select_pt";
+			label = "Select a point on screen";
 			alignment = right;
 		}
 
 	}
 	// would be SO COOL if when you hovered over each of these an image popped up that showed what each looks like
-	: boxed_column {label = "Crease Pattern Type";	
-		//: row {
-			: toggle {
+	: boxed_radio_column {label = "Crease Pattern Type";	
+			: radio_button {
 				key = "mountain";
 				label = "Mountain";
-				alignment = left;
+				value = "1";
 			}
-			: toggle {
+			: radio_button {
 				key = "valley";
 				label = "Valley";
-				alignment = left;
 			}
-			: toggle {
+			: radio_button {
 				key = "polygon";
 				label = "Polygon";
-				alignment = left;
 			}
-		//}
 
 	}
 	// i think it would be better if this had less text and instead the user could hover over a shorter description and get more detail then

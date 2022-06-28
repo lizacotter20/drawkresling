@@ -1,37 +1,6 @@
-(defun c:drawkresling ()
+(defun c:drawkresling (H H0 n b p2 crease_type hole layers)
 
-;get relevant parameters from user
-(setq H (getreal "\nEnter deployed height:"))
-(setq H0 (getreal "\nEnter folded height:"))
-(setq n (getint "\nEnter number of polygon edges:"))
-
-;check the design constraint
-(if (> (abs (- (expt H 2) (expt H0 2))) (expt (cot (/ pi n)) 2))
-    (progn
-       (print "Your parameters have failed to meet the design constraint |H^2 - H0^2| <= cot^2(pi/n)")
-       (print "Please adjust your parameters and try again")
-       (exit) 
-    )
-    (print '())
-)
-
-;continue getting relevant parameters from user
-(setq b (getreal "\nEnter length of each polygon edge:"))
-(setq p2 (getpoint "\nPick starting point for first polygon edge:"))
-
-;ask if the user wants the outline and creases in different layers
-(setq bad_res T)
-(setq layers nil)
-(while bad_res
-	(setq response (getstring "\nWould you like the outline and creases to be in different layers (for laser cutting)? <Y/n>"))
-	(cond 
-		((= response "Y") (setq layers T) (setq bad_res nil)) 
-		((= response "y") (setq layers T) (setq bad_res nil))  
-		((= response "N") (setq layers nil) (setq bad_res nil))  
-		((= response "n") (setq layers nil) (setq bad_res nil)) 
-		(T (print "Invalid response, please type Y, y, N, or n")) 
-	)
-)
+(print "still need to fix that weird thing")
 
 ;the second point is the desired distance from the user selected first point
 (setq p1 (list (+ (car p2) b) (cadr p2))) 
