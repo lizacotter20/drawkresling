@@ -1,7 +1,7 @@
 (prompt "\nType drawkreslingvis to run.....")
  
 (defun c:drawkreslingvis ( / dcl_id)
-(print "newWWWWWWW")
+(print "newewewewewewew")
 
 ;flag is for discerning whether the dialog was canceled or hidden for starting point selection
 (setq flag 5)
@@ -50,6 +50,18 @@
      (action_tile "x" "(setq xstr $value)")
      (action_tile "y" "(setq ystr $value)") 
 
+     (if (= p2 nil)
+          (setq p2 (list (distof (get_tile "x")) (distof (get_tile "y"))))
+     )
+
+     ;remember which radio button was chosen last time
+     (cond
+         ((= crease_type nil) (setq crease_type "m"))
+         ((= crease_type "m") (print "mountain") (set_tile "mountain" "1"))
+         ((= crease_type "v") (print "valley") (set_tile "valley" "1")) 
+         ((= crease_type "p") (print "polygon") (set_tile "polygon" "1")) 
+     )
+
      ;radio buttons
      (action_tile "mountain" "(setq crease_type \"m\")")
      (action_tile "valley" "(setq crease_type \"v\")")
@@ -58,7 +70,7 @@
      ;other options
      (action_tile "hole" "(setq hole $value)")
      (action_tile "layers" "(setq layers $value)")
-   
+
      ;in order for the user to be able to press ok, make sure the design constraints are not violated and that the parameter types are correct
      (action_tile "accept" "(checktypes)")
      ;(action_tile "accept" "(done_dialog 1)")
@@ -85,33 +97,35 @@
 )
 
 (unload_dialog dcl_id)
-(print "unloaded")
+"""
+(print canceled)
 (print crease_type)
-(print (distof xstr))
-(print (distof ystr))
+(print xstr)
+(print ystr)
+(print (car p2))
+(print (cadr p2))
 (print (distof Hstr))
 (print (distof H0str))       
 (print (atoi nstr))
 (print (distof bstr)) 
+"""
+(print layers)
+(print hole)
 
 (if canceled
-     (print '())
+     (setq canceled nil)
      (progn
+          (print "not canceled ig")
           ;convert string values to reals or ints
           (setq H (distof Hstr))
           (setq H0 (distof H0str))
           (setq n (atoi nstr))
           (setq b (distof bstr))
-          ;useful terms to clean up the calculations
-          (setq H0sqr (expt H0 2))
-          (setq Hsqr (expt H 2))
-          (setq plusminus (- (+ 1 Hsqr) H0sqr))
-          (setq minusplus (+ (- 1 Hsqr) H0sqr))
-          (setq param (/ pi n))
+          ;call drawkresling
+          (drawkresling H H0 n b p2 crease_type hole layers)
      )
 )
 
- 
 (princ)
  
 )

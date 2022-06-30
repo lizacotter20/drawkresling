@@ -1,4 +1,4 @@
-(defun c:drawkresling (H H0 n b p2 crease_type hole layers)
+(defun drawkresling (H H0 n b p2 crease_type hole layers)
 
 (print "still need to fix that weird thing")
 
@@ -58,7 +58,37 @@
 	(command "_pline" p1 p2 p3 p4 p1 p3 p5 p6 p4 *Cancel*)
 )
 
+(setq firstt 1)
 (repeat (- n 1)
- (command "rotate" (entlast) "" p0 "C" (/ 360.0 n))
+	(if (= firstt 1)
+		(progn
+			(command "rotate" (entlast) "" p0 (/ 360.0 n) "")
+			(setq firstt 0)
+		)
+		(command "rotate" (entlast) "" p0 "C" (/ 360.0 n))
+	)	
 )
+
+;make polygon tab
+(command "_polygon" n "E" p4 p3)
+
+(if layers
+	(progn
+		;add the polygon to the outline
+		(command "_change" (entlast) "" "_p" "_la" "outline" "")
+		;delete the crease segment of the polygon
+		(command "_break" p3 p4)
+		;draw the rest of the outline
+		(command "_line" p2 p3 *Cancel*)
+ 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
+ 		(command "_line" p1 p4 *Cancel*)
+ 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
+ 		;draw the creases
+		(command "_pline" p2 p1 p3 p4 *Cancel*)
+ 		(command "_change" (entlast) "" "_p" "_la" "creases" "")
+	)
+	;draw one side panel and one tab
+	(command "_pline" p1 p3 p2 p1 p4 *Cancel*)
+)
+
 )

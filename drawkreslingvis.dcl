@@ -10,7 +10,7 @@ drawkreslingvis : dialog { label = "Draw Kresling";
 		edit_limit = 10;
 		edit_width = 10;
 		key = "H";
-		value = 0;
+		// value = 0;
 		}
 
 		: edit_box { 
@@ -92,7 +92,7 @@ drawkreslingvis : dialog { label = "Draw Kresling";
 			: toggle {
 				key = "hole";
 				label = "Circular hole in the top and bottom polygons?";
-				alignment = left;
+				// value = 
 			}
 			: toggle {
 				key = "layers";
