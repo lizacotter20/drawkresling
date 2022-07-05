@@ -1,114 +1,172 @@
-(defun drawkresling (H H0 n b p2 crease_type hole diameter layers)
+(prompt "\nType drawkreslingvis to run.....")
+ 
+(defun c:drawkreslingvis ( / dcl_id)
+     (print "newfsfsfsfsfsfs")
 
-	(print "still need to fix that weird thing")
-	(print "hole")
-	(print hole)
-	(print "diameterr")
-	(print diameter)
+     ;flag is for discerning whether the dialog was canceled or hidden for starting point selection
+     (setq flag 5)
 
-	;the second point is the desired distance from the user selected first point
-	(setq p1 (list (+ (car p2) b) (cadr p2))) 
+     ;load the dialog 
+     (setq dcl_id (load_dialog "drawkreslingvis.dcl"))
 
-	;useful terms to clean up the calculations
-	(setq H0sqr (expt H0 2))
-	(setq Hsqr (expt H 2))
-	(setq plusminus (- (+ 1 Hsqr) H0sqr))
-	(setq minusplus (+ (- 1 Hsqr) H0sqr))
-	(setq param (/ pi n))
+     ;while the flag is not accept or cancel
+     (while (> flag 2)
+          ;make a new dialog
+          (if (not (new_dialog "drawkreslingvis" dcl_id))
+               (exit)
+          )
+          
+          ;set the values of the edit_boxes to their previous values, if there is one
+          (if (= Hstr nil)
+               (action_tile "H" "(setq Hstr $value)")
+               (set_tile "H" Hstr)
+          )
+          (if (= H0str nil)
+               (action_tile "H0" "(setq H0str $value)")
+               (set_tile "H0" H0str)
+          )
+          (if (= nstr nil)
+               (action_tile "n" "(setq nstr $value)")
+               (set_tile "n" nstr)
+          )
+          (if (= bstr nil)
+               (action_tile "b" "(setq bstr $value)")
+               (set_tile "b" bstr)
+          )
+          (if (= xstr nil)
+               (progn
+                    (action_tile "x" "(setq xstr $value)")
+                    (setq xstr "0")
+               )
+               (set_tile "x" xstr)
+          )
+          (if (= ystr nil)
+               (progn
+                    (action_tile "y" "(setq ystr $value)")
+                    (setq ystr "0")
+               )
+               (set_tile "y" ystr)
+          )   
 
-	;do the calculations for the Kresling
-	(setq x1 (/ (* (* 2 (sin param)) (- (* (sin param) (expt (- (* (expt (cot param) 2) (expt (csc param) 2)) (expt (- Hsqr H0sqr) 2)) 0.5)) (cos param))) (+ plusminus (* minusplus (cos (* 2 param))))))
-	(setq x2 (/ (* (* 2 (sin param)) (- (* (sin param) (expt (- (* (expt (cot param) 2) (expt (csc param) 2)) (expt (- Hsqr H0sqr) 2)) 0.5)) (cos param))) (+ minusplus (* plusminus (cos (* 2 param))))))
-	(setq denom (+ (expt x2 2) 1))
-	(setq c (/ (* b (expt (+ (+ (* H0sqr (expt denom 2)) (* (* (expt x2 3) (cot param)) (+ (* x2 (cot param)) 2))) (expt x2 2)) 0.5)) denom))
-	(setq a (* b (expt (+ H0sqr (/ (* (expt x2 2) (expt (csc param) 2)) denom)) 0.5)))
+          ;update string values with the values in the boxes, if they've been changed
+          (action_tile "H" "(setq Hstr $value)")
+          (action_tile "H0" "(setq H0str $value)") 
+          (action_tile "n" "(setq nstr $value)")
+          (action_tile "b" "(setq bstr $value)")
+          (action_tile "x" "(setq xstr $value)")
+          (action_tile "y" "(setq ystr $value)") 
 
-	;g is distance in x from p2 to p3
-	(setq g (expt (- (expt a 2) (expt c 2)) 0.5))
-	;two points for the side panel
-	(setq p3 (list (- (car p2) g) (- (cadr p2) c)))
-	(setq p4 (list (+ (car p3) b) (cadr p3)))
+          (if (= p2 nil)
+               (setq p2 (list (distof (get_tile "x")) (distof (get_tile "y"))))
+          )
 
-	;find the center of the polygon
-	(setq apothem (/ b (* 2 (tan param))))
-	(setq p0 (list (+ (car p2) (* 0.5 b)) (+ (cadr p2) apothem)))
+          ;remember which radio button was chosen last time
+          (cond
+              ((= crease_type nil) (setq crease_type "m"))
+              ((= crease_type "m") (print "mountain") (set_tile "mountain" "1"))
+              ((= crease_type "v") (print "valley") (set_tile "valley" "1")) 
+              ((= crease_type "p") (print "polygon") (set_tile "polygon" "1")) 
+          )
 
-	;f is distance in x from p2 to p6
-	(setq tabwidth (* 0.33333 apothem)) 
-	(setq f (abs (/ tabwidth (tan (/ (* param (- n 2)) 2)))))
-	;two points for the tab
-	(setq p5 (list (+ (car p3) f) (- (cadr p3) tabwidth)))
-	(setq p6 (list (- (car p4) f) (- (cadr p4) tabwidth)))
+          ;radio buttons
+          (action_tile "mountain" "(setq crease_type \"m\")")
+          (action_tile "valley" "(setq crease_type \"v\")")
+          (action_tile "polygon" "(setq crease_type \"p\")")
 
-	(if (= layers "1")
-		(progn
-			;draw the outline
-			(command "_pline" p1 p4 p6 p5 p3 p2 *Cancel*)
-			(command "_layer" "_n" "outline" "")
-			(command "_layer" "_color" 4 "outline" "")
-	 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
-	 		;draw the creases
-			(command "_pline" p2 p1 p3 p4 *Cancel*)
-			(command "_layer" "_n" "creases" "")
-			(command "_layer" "_color" 3 "creases" "")
-	 		(command "_change" (entlast) "" "_p" "_la" "creases" "")
-	 		;select and group the panel and tab
-			(setq p7 (list (car p3) (cadr p2)))
-			(setq p8 (list (car p1) (cadr p6)))
-			(setq set1 (ssget "W" p7 p8))
-			(command "_.group" "c" "*" "panel and tab" set1 "")
-		)
-		;draw one side panel and one tab
-		(command "_pline" p1 p2 p3 p4 p1 p3 p5 p6 p4 *Cancel*)
-	)
+          ;the diameter edit_box is only enabled when the hole toggle is turned on
+          ;(mode_tile "diameter" 1)
+          (if (= hole nil)
+               (progn
+                    (print "nil bitvh")
+                    (action_tile "hole" "(mode_tile \"diameter\" (- 1 (atoi $value))) (setq hole $value)")
+                    (mode_tile "diameter" 1)
+               )
+               (progn
+                    (set_tile "hole" hole)
+                    (mode_tile "diameter" (- 1 (atoi hole)))
+                    (set_tile "diameter" diameterstr)
+               )
+          )
+          (action_tile "hole" "(mode_tile \"diameter\" (- 1 (atoi $value))) (setq hole $value)")
+          (action_tile "diameter" "(setq diameterstr $value)") 
+          
+          ;remember whether the user previously had the layers option turned on
+          (if (= layers nil)
+               (action_tile "layers" "(setq layers $value)")
+               (set_tile "layers" layers)
+          )
+          (action_tile "layers" "(setq layers $value)")
 
-	(setq firstt 1)
-	(repeat (- n 1)
-		(if (= firstt 1)
-			(progn
-				(command "rotate" (entlast) "" p0 (/ 360.0 n) "")
-				(setq firstt 0)
-			)
-			(command "rotate" (entlast) "" p0 "C" (/ 360.0 n))
-		)	
-	)
+          (print "layers")
+     (print layers)
+     (print "hole")
+     (print hole)
 
-	;make polygon tab
-	(command "_polygon" n "E" p4 p3)
+          ;in order for the user to be able to press ok, make sure the design constraints are not violated and that the parameter types are correct
+          (action_tile "accept" "(checktypes)")
+          ;(action_tile "accept" "(done_dialog 1)")
+          (print "hole2")
 
-	(if (= layers "1")
-		(progn
-			;add the polygon to the outline
-			(command "_change" (entlast) "" "_p" "_la" "outline" "")
-			;delete the crease segment of the polygon
-			(command "_break" p3 p4)
-			;draw the rest of the outline
-			(command "_line" p2 p3 *Cancel*)
-	 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
-	 		(command "_line" p1 p4 *Cancel*)
-	 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
-	 		;draw the creases
-			(command "_pline" p2 p1 p3 p4 *Cancel*)
-	 		(command "_change" (entlast) "" "_p" "_la" "creases" "")
-		)
-		;draw one side panel and one tab
-		(command "_pline" p1 p3 p2 p1 p4 *Cancel*)
-	)
+          ;set canceled to true if the dialog was canceled so we dont do unecessary calculations + drawings
+          (action_tile "cancel" "(setq canceled T)")
+          ;(action_tile "cancel" "(done_dialog 0)")
 
-	(if (= hole "1")
-		(progn
-			;find center of tab polygon
-			(setq p00 (list (+ (car p3) (* 0.5 b)) (- (cadr p3) apothem)))
-			;draw the circle for the top tab
-			(command "_circle" p00 (/ diameter 2))
-			(if (= layers "1")
-				(command "_change" (entlast) "" "_p" "_la" "outline" "")
-			)
-			;draw the circle for the bottom tab
-			(command "_circle" p0 (/ diameter 2))
-			(if (= layers "1")
-				(command "_change" (entlast) "" "_p" "_la" "outline" "")
-			)
-		)
-	)
+          ;flag to hide the dialog box is 5
+          (action_tile "select_pt" "(done_dialog 5)")
+
+          ;set the flag to whatever start_dialog pulls from done_dialog
+          (setq flag (start_dialog))
+
+          ;if the select point button was clicked 
+          (if (= flag 5)
+               ;get the point from the user
+               (progn
+                    (setq p2 (getpoint))
+                    (setq xstr (rtos (car p2)))
+                    (setq ystr (rtos (cadr p2)))
+               )
+          )
+     )
+
+     (unload_dialog dcl_id)
+     """
+     (print canceled)
+     (print crease_type)
+     
+     (print (car p2))
+     (print (cadr p2))
+     (print (distof Hstr))
+     (print (distof H0str))       
+     (print (atoi nstr))
+     (print (distof bstr)) 
+     """
+     (print "layers")
+     (print layers)
+     (print "hole")
+     (print hole)
+     
+     (print "diameter")
+     (print diameterstr)
+
+     (print xstr)
+     (print ystr)
+
+     (if canceled
+          (setq canceled nil)
+          (progn
+               (print "not canceled ig")
+               ;convert string values to reals or ints
+               (setq H (distof Hstr))
+               (setq H0 (distof H0str))
+               (setq n (atoi nstr))
+               (setq b (distof bstr))
+               (setq diameter (distof diameterstr))
+               ;get the latest point from the box
+               (setq p2 (list (distof xstr) (distof ystr)))
+               ;call drawkresling
+               (drawkresling H H0 n b p2 crease_type hole diameter layers)
+          )
+     )
+     (princ)
 )
+ 
