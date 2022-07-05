@@ -1,4 +1,4 @@
-(defun drawkresling (H H0 n b p2 crease_type hole diameter layers)
+(defun drawkreslingmountain (H H0 n b p2 crease_type hole diameter layers)
 
 	(print "still need to fix that weird thing")
 	(print "hole")

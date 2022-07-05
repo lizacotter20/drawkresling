@@ -1,18 +1,18 @@
-(prompt "\nType drawkreslingvis to run.....")
+(prompt "\nType drawkresling to run.....")
  
-(defun c:drawkreslingvis ( / dcl_id)
+(defun c:drawkresling ( / dcl_id)
      (print "newfsfsfsfsfsfs")
 
      ;flag is for discerning whether the dialog was canceled or hidden for starting point selection
      (setq flag 5)
 
      ;load the dialog 
-     (setq dcl_id (load_dialog "drawkreslingvis.dcl"))
+     (setq dcl_id (load_dialog "drawkresling.dcl"))
 
      ;while the flag is not accept or cancel
      (while (> flag 2)
           ;make a new dialog
-          (if (not (new_dialog "drawkreslingvis" dcl_id))
+          (if (not (new_dialog "drawkresling" dcl_id))
                (exit)
           )
           
@@ -164,7 +164,7 @@
                ;get the latest point from the box
                (setq p2 (list (distof xstr) (distof ystr)))
                ;call drawkresling
-               (drawkresling H H0 n b p2 crease_type hole diameter layers)
+               (drawkreslingmountain H H0 n b p2 crease_type hole diameter layers)
           )
      )
      (princ)

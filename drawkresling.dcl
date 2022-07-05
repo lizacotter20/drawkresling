@@ -1,4 +1,4 @@
-drawkreslingvis : dialog { label = "Draw Kresling";
+drawkresling : dialog { label = "Draw Kresling";
 
 	// would love to add some color to this situation, primarily to make it easier to differentiate between sets of options, but also bc I think it would look nicer
 
