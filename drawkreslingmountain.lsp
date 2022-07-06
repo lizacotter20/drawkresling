@@ -1,4 +1,4 @@
-(defun drawkreslingmountain (H H0 n b p2 crease_type hole diameter layers)
+(defun drawkreslingmountain (H H0 n b p2 crease_type hole diameter layers / p1 H0sqr Hsqr plusminus minusplus param x1 x2 denom c a g p3 p4 apothem p0 tabwidth j p5 p6 firstt) 
 
 	(print "still need to fix that weird thing")
 	(print "hole")
@@ -33,12 +33,12 @@
 	(setq apothem (/ b (* 2 (tan param))))
 	(setq p0 (list (+ (car p2) (* 0.5 b)) (+ (cadr p2) apothem)))
 
-	;f is distance in x from p2 to p6
+	;j is distance in x from p2 to p6
 	(setq tabwidth (* 0.33333 apothem)) 
-	(setq f (abs (/ tabwidth (tan (/ (* param (- n 2)) 2)))))
+	(setq j (/ tabwidth (tan (/ (* param (- n 2)) 2))))
 	;two points for the tab
-	(setq p5 (list (+ (car p3) f) (- (cadr p3) tabwidth)))
-	(setq p6 (list (- (car p4) f) (- (cadr p4) tabwidth)))
+	(setq p5 (list (+ (car p3) j) (- (cadr p3) tabwidth)))
+	(setq p6 (list (- (car p4) j) (- (cadr p4) tabwidth)))
 
 	(if (= layers "1")
 		(progn

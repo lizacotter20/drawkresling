@@ -1,7 +1,7 @@
 (prompt "\nType drawkresling to run.....")
  
-(defun c:drawkresling ( / dcl_id)
-     (print "newfsfsfsfsfsfs")
+(defun c:drawkresling ( / dcl_id flag Hstr H0str nstr bstr xstr ystr p2 crease_type hole diameterstr layers H H0 n b diameter)
+     (print "newywywywywyw")
 
      ;flag is for discerning whether the dialog was canceled or hidden for starting point selection
      (setq flag 5)
@@ -77,7 +77,6 @@
           ;(mode_tile "diameter" 1)
           (if (= hole nil)
                (progn
-                    (print "nil bitvh")
                     (action_tile "hole" "(mode_tile \"diameter\" (- 1 (atoi $value))) (setq hole $value)")
                     (mode_tile "diameter" 1)
                )
@@ -160,7 +159,10 @@
                (setq H0 (distof H0str))
                (setq n (atoi nstr))
                (setq b (distof bstr))
-               (setq diameter (distof diameterstr))
+               (if (= hole "1")
+               	(setq diameter (distof diameterstr))
+               	(setq diameter 0)
+               )
                ;get the latest point from the box
                (setq p2 (list (distof xstr) (distof ystr)))
                ;call drawkresling

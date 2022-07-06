@@ -106,27 +106,6 @@ drawkresling : dialog { label = "Draw Kresling";
 		}
 	}
 	ok_cancel;
-	/*
-	:row{
-		: button{
-		key = "accept";
-		label = "OK";
-		is_default = true;
-		fixed_width = true;
-		alignment = centered;
-		}
-
-		// would be great if the red x worked...
-		// if not the ok and cancel buttons should be a defined distance from each other
-		:button {
-		key="cancel"; 
-		label="Cancel"; 
-		is_cancel="true";
-		fixed_width = true;
-		alignment = centered;
-		}
-	}
-	*/
 	
 		: errtile
 		{
