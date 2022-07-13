@@ -53,10 +53,12 @@
 			(command "_layer" "_color" 3 "creases" "")
 	 		(command "_change" (entlast) "" "_p" "_la" "creases" "")
 	 		;select and group the panel and tab
-			(setq p7 (list (car p3) (cadr p2)))
-			(setq p8 (list (car p1) (cadr p6)))
-			(setq set1 (ssget "W" p7 p8))
-			(command "_.group" "c" "*" "panel and tab" set1 "")
+			;(setq p7 (list (car p3) (cadr p2)))
+			;(setq p8 (list (car p1) (cadr p6)))
+			;(setq set1 (ssget "W" p7 p8))
+			(setq ptList (list p1 p2 p3 p4 p1 p3 p5 p6))
+			(setq set1 (ssget "F" ptList))
+			(command "_.group" "c" "panel_and_tab" "panel and tab" set1 "")
 		)
 		;draw one side panel and one tab
 		(command "_pline" p1 p2 p3 p4 p1 p3 p5 p6 p4 *Cancel*)
@@ -90,6 +92,7 @@
 	 		;draw the creases
 			(command "_pline" p2 p1 p3 p4 *Cancel*)
 	 		(command "_change" (entlast) "" "_p" "_la" "creases" "")
+	 		(command "_ungroup" "NA" "panel_and_tab")
 		)
 		;draw one side panel and one tab
 		(command "_pline" p1 p3 p2 p1 p4 *Cancel*)
