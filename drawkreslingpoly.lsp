@@ -1,14 +1,16 @@
-(defun drawkreslingmountain (H H0 n b p2 crease_type hole diameter layers / p1 H0sqr Hsqr plusminus minusplus param x1 x2 denom c a g p3 p4 apothem p0 tabwidth j p5 p6 firstt) 
+(defun drawkreslingpoly (H H0 n b p2 crease_type hole diameter layers / p1 H0sqr Hsqr plusminus minusplus param x1 x2 denom c a g p3 p4 apothem p0 tabwidth j p5 p6 firstt) 
 
 	(defun *error* (msg)
 		(if (= msg "Function cancelled")
 			(progn
 				(print "Function was canceled, exploding groups")
 				(command-s "_ungroup" "NA" "panel_and_tab" "")
+				(command "_ucs" "W")
 			)
 			(progn
 				(print "Error thrown, exploding groups")
 				(command-s "_ungroup" "NA" "panel_and_tab" "")
+				(command "_ucs" "W")
 			)
 		)
 	)
@@ -37,87 +39,125 @@
 	(setq p3 (list (- (car p2) g) (- (cadr p2) c)))
 	(setq p4 (list (+ (car p3) b) (cadr p3)))
 
-	;find the center of the polygon
+	;find the apothem of the polygon
 	(setq apothem (/ b (* 2 (tan param))))
-	(setq p0 (list (+ (car p2) (* 0.5 b)) (+ (cadr p2) apothem)))
 
 	;j is distance in x from p2 to p6
 	(setq tabwidth (* 0.33333 apothem)) 
 	(setq j (/ tabwidth (tan (/ (* param (- n 2)) 2))))
-	;two points for the tab
+	;two points for the bottom tab
 	(setq p5 (list (+ (car p3) j) (- (cadr p3) tabwidth)))
 	(setq p6 (list (- (car p4) j) (- (cadr p4) tabwidth)))
+	;two points for the top tab
+	(setq p7 (list (+ (car p2) j) (+ (cadr p2) tabwidth)))
+	(setq p8 (list (- (car p1) j) (+ (cadr p1) tabwidth)))
 
 	;zoom to drawing area (with lots of margin room)
-	(setq halfwindowside (+ (* 5 apothem) (* -1 (cadr p4))))
-	(setq bottomleft (list (- (car p0) halfwindowside) (- (cadr p0) halfwindowside)))
-	(setq topright (list (+ (car p0) halfwindowside) (+ (cadr p0) halfwindowside)))
+	(setq bottomleft (list (- (car p3) apothem) (- (cadr p3) (* 4 apothem))))
+	(setq topright (list (+ (+ (car p2) (* n b)) tabwidth) (+ (cadr p2) (* 4 apothem))))
 	(command "_zoom" bottomleft topright)
 
 	;start drawing
 	(if (= layers "1")
 		(progn
 			;draw the outline
-			(command "_pline" p1 p4 p6 p5 p3 p2 *Cancel*)
+			(command "_pline" p1 p8 p7 p2 *Cancel*)
 			(command "_layer" "_n" "outline" "")
 			(command "_layer" "_color" 4 "outline" "")
 	 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
+	 		(command "_pline" p4 p6 p5 p3 *Cancel*)
+	 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
 	 		;draw the creases
-			(command "_pline" p2 p1 p3 p4 *Cancel*)
+			(command "_pline" p4 p3 p1 p2 p3 *Cancel*)
 			(command "_layer" "_n" "creases" "")
 			(command "_layer" "_color" 3 "creases" "")
 	 		(command "_change" (entlast) "" "_p" "_la" "creases" "")
 	 		;select and group the panel and tab
-			;(setq p7 (list (car p3) (cadr p2)))
-			;(setq p8 (list (car p1) (cadr p6)))
-			;(setq set1 (ssget "W" p7 p8))
-			(setq ptList (list p1 p2 p3 p4 p1 p3 p5 p6))
+			(setq ptList (list p1 p8 p7 p2 p3 p5 p6 p4 p3 p1 p2))
 			(setq set1 (ssget "F" ptList))
 			(command "_.group" "c" "panel_and_tab" "panel and tab" set1 "")
 		)
 		;draw one side panel and one tab
-		(command "_pline" p1 p2 p3 p4 p1 p3 p5 p6 p4 *Cancel*)
+		(command "_pline" p1 p8 p7 p2 p3 p5 p6 p4 p3 p1 p2 *Cancel*)
 	)
 
-	;rotate the tab
+	;translate the tab 
 	(setq firstt 1)
+	(setq i 0)
 	(repeat (- n 1)
 		(if (= firstt 1)
 			(progn
-				(command "rotate" (entlast) "" p0 (/ 360.0 n) "")
+				(command "move" (entlast) "" p2 p1 "")
 				(setq firstt 0)
+				(setq i (+ i 1))
 			)
-			(command "rotate" (entlast) "" p0 "C" (/ 360.0 n))
+			(progn
+				(setq pbase (list (+ (car p2) (* i b)) (cadr p2)))
+				(setq pdisplace (list (+ (car pbase) b) (cadr pbase)))
+				(command "copy" (entlast) "" pbase  pdisplace)
+				;if this is our last time through
+				(if (= i (- n 1))
+					(progn
+						;set up new coordinate system for drawing the end tab
+						(setq p1t (list (+ (car p1) (* i b)) (cadr p1)))
+						(setq p4t (list (+ (car p4) (* i b)) (cadr p4)))
+						(setq newp1t (list (- (car p1t) (car p4t)) (- (cadr p1t) (cadr p4t))))
+						(command "_ucs" p4t newp1t "")
+						;two points for the tab
+						(setq tab1 (list (- (car newp1t) j) (- (cadr newp1t) tabwidth)))
+						(setq tab4 (list (+ (car p4t) j) (- (cadr p4t) tabwidth)))
+						;(command "_ucs" "NA" "S" "endtab")
+						;draw the end tab
+						(command "_pline" newp1t tab1 tab4 p4t)
+						(if (= layers "1")
+							;add the tab to the outline
+							(command "_change" (entlast) "" "_p" "_la" "outline" "")
+						)
+						(command "_line" newp1t p4t)
+						(if (= layers "1")
+							;last crease
+							(command "_change" (entlast) "" "_p" "_la" "creases" "")
+						)
+						(command "_ucs" "W")
+					)
+				)
+				(setq i (+ i 1))
+			)
 		)	
 	)
 
-	;make polygon tab
+	;make polygon tabs
 	(command "_polygon" n "E" p4 p3)
+	(if (= layers "1")
+		;add the tab to the outline
+		(command "_change" (entlast) "" "_p" "_la" "outline" "")
+	)
+	(command "_polygon" n "E" p2 p1)
 
 	(if (= layers "1")
 		(progn
 			;add the polygon to the outline
 			(command "_change" (entlast) "" "_p" "_la" "outline" "")
-			;delete the crease segment of the polygon
+			;delete the crease segments of the polygons
 			(command "_break" p3 p4)
-			;draw the rest of the outline
+			(command "_break" p2 p1)
+			;draw the last segment of the outline
 			(command "_line" p2 p3 *Cancel*)
-	 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
-	 		(command "_line" p1 p4 *Cancel*)
 	 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
 	 		;draw the creases
 			(command "_pline" p2 p1 p3 p4 *Cancel*)
 	 		(command "_change" (entlast) "" "_p" "_la" "creases" "")
 	 		(command "_ungroup" "NA" "panel_and_tab")
 		)
-		;draw one side panel and one tab
-		(command "_pline" p1 p3 p2 p1 p4 *Cancel*)
+		;finish the panel
+		(command "_pline" p2 p3 p1 *Cancel*)
 	)
 
 
 	(if (= hole "1")
 		(progn
-			;find center of tab polygon
+			;find the centers of the polygons
+			(setq p0 (list (+ (car p2) (* 0.5 b)) (+ (cadr p2) apothem)))
 			(setq p00 (list (+ (car p3) (* 0.5 b)) (- (cadr p3) apothem)))
 			;draw the circle for the top tab
 			(command "_circle" p0 (/ diameter 2))
@@ -131,6 +171,5 @@
 			)
 		)
 	)
-
 )
 
