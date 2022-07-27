@@ -20,8 +20,10 @@
 	(setq p1 (list (+ (car p2) b) (cadr p2))) 
 
 	;useful terms to clean up the calculations
-	(setq H0sqr (expt H0 2))
-	(setq Hsqr (expt H 2))
+	(setq H0scale (/ H0 b))
+	(setq Hscale (/ H b))
+	(setq H0sqr (expt H0scale 2))
+	(setq Hsqr (expt Hscale 2))
 	(setq plusminus (- (+ 1 Hsqr) H0sqr))
 	(setq minusplus (+ (- 1 Hsqr) H0sqr))
 	(setq param (/ pi n))
@@ -73,7 +75,7 @@
 			(command "_layer" "_color" 3 "creases" "")
 	 		(command "_change" (entlast) "" "_p" "_la" "creases" "")
 	 		;select and group the panel and tab
-			(setq ptList (list p1 p8 p7 p2 p3 p5 p6 p4 p3 p1 p2))
+			(setq ptList (list p1 p2 p3 p4 p1 p3 p5 p6))
 			(setq set1 (ssget "F" ptList))
 			(command "_.group" "c" "panel_and_tab" "panel and tab" set1 "")
 		)
@@ -96,24 +98,27 @@
 				(setq pdisplace (list (+ (car pbase) b) (cadr pbase)))
 				(command "copy" (entlast) "" pbase  pdisplace)
 				;if this is our last time through
-				(if (= i (- n 1))
+				(if (= i (- n 2))
 					(progn
 						;set up new coordinate system for drawing the end tab
-						(setq p1t (list (+ (car p1) (* i b)) (cadr p1)))
-						(setq p4t (list (+ (car p4) (* i b)) (cadr p4)))
+						(setq p1t (list (+ (car p1) (* (+ i 1) b)) (cadr p1)))
+						(setq p4t (list (+ (car p4) (* (+ i 1) b)) (cadr p4)))
 						(setq newp1t (list (- (car p1t) (car p4t)) (- (cadr p1t) (cadr p4t))))
 						(command "_ucs" p4t newp1t "")
+						(setq distp1p4 (expt (+ (expt (- (cadr p1t) (cadr p4t)) 2) (expt (- (car p1t) (car p4t)) 2)) 0.5))
+						(setq newp1tt (list distp1p4 0))
 						;two points for the tab
-						(setq tab1 (list (- (car newp1t) j) (- (cadr newp1t) tabwidth)))
-						(setq tab4 (list (+ (car p4t) j) (- (cadr p4t) tabwidth)))
+						(setq tab1 (list (- (car newp1tt) j) (* -1 tabwidth)))
+						(setq tab4 (list j (* -1 tabwidth)))
 						;(command "_ucs" "NA" "S" "endtab")
 						;draw the end tab
-						(command "_pline" newp1t tab1 tab4 p4t)
+						(setq origin (list 0 0))
+						(command "_pline" newp1tt tab1 tab4 origin *Cancel*)
 						(if (= layers "1")
 							;add the tab to the outline
 							(command "_change" (entlast) "" "_p" "_la" "outline" "")
 						)
-						(command "_line" newp1t p4t)
+						(command "_line" newp1tt origin *Cancel*)
 						(if (= layers "1")
 							;last crease
 							(command "_change" (entlast) "" "_p" "_la" "creases" "")
@@ -127,20 +132,20 @@
 	)
 
 	;make polygon tabs
-	(command "_polygon" n "E" p4 p3)
+	(command "_polygon" n "E" p4 p3 *Cancel*)
 	(if (= layers "1")
 		;add the tab to the outline
 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
 	)
-	(command "_polygon" n "E" p2 p1)
+	(command "_polygon" n "E" p2 p1 *Cancel*)
 
 	(if (= layers "1")
 		(progn
 			;add the polygon to the outline
 			(command "_change" (entlast) "" "_p" "_la" "outline" "")
 			;delete the crease segments of the polygons
-			(command "_break" p3 p4)
-			(command "_break" p2 p1)
+			(command "_break" p3 p4 *Cancel*)
+			(command "_break" p2 p1 *Cancel*)
 			;draw the last segment of the outline
 			(command "_line" p2 p3 *Cancel*)
 	 		(command "_change" (entlast) "" "_p" "_la" "outline" "")

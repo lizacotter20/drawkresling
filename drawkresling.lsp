@@ -167,7 +167,7 @@
                ;call drawkresling
                (cond
                	((= crease_type_trad "m") (drawkreslingmountain H H0 n b p2 crease_type_trad holetrad diameter layerstrad))
-               	((= crease_type_trad "v") (drawkreslingmountain H H0 n b p2 crease_type_trad holetrad diameter layerstrad)) ;havent implemented valley yet
+               	((= crease_type_trad "v") (drawkreslingvalley H H0 n b p2 crease_type_trad holetrad diameter layerstrad)) 
                	((= crease_type_trad "p") (drawkreslingpoly H H0 n b p2 crease_type_trad holetrad diameter layerstrad))
                )
                

@@ -18,8 +18,10 @@
 	(setq p1 (list (+ (car p2) b) (cadr p2))) 
 
 	;useful terms to clean up the calculations
-	(setq H0sqr (expt H0 2))
-	(setq Hsqr (expt H 2))
+	(setq H0scale (/ H0 b))
+	(setq Hscale (/ H b))
+	(setq H0sqr (expt H0scale 2))
+	(setq Hsqr (expt Hscale 2))
 	(setq plusminus (- (+ 1 Hsqr) H0sqr))
 	(setq minusplus (+ (- 1 Hsqr) H0sqr))
 	(setq param (/ pi n))
@@ -110,7 +112,7 @@
 	 		(command "_change" (entlast) "" "_p" "_la" "creases" "")
 	 		(command "_ungroup" "NA" "panel_and_tab")
 		)
-		;draw one side panel and one tab
+		;finish first panel
 		(command "_pline" p1 p3 p2 p1 p4 *Cancel*)
 	)
 
