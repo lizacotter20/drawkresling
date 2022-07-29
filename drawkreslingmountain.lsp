@@ -1,14 +1,16 @@
-(defun drawkreslingmountain (H H0 n b p2 crease_type hole diameter layers / p1 H0sqr Hsqr plusminus minusplus param x1 x2 denom c a g p3 p4 apothem p0 tabwidth j p5 p6 firstt) 
-
+(defun drawkreslingmountain (H H0 n b p2 crease_type chir hole diameter layers / p1 H0sqr Hsqr plusminus minusplus param x1 x2 denom c a g p3 p4 apothem p0 tabwidth j p5 p6 firstt)
+	
 	(defun *error* (msg)
 		(if (= msg "Function cancelled")
 			(progn
-				(print "Function was canceled, exploding groups")
+				(print "Function was canceled, exploding groups mnountain")
 				(command-s "_ungroup" "NA" "panel_and_tab" "")
+				(command-s "_ungroup" "NA" "first_rot" "")
 			)
 			(progn
-				(print "Error thrown, exploding groups")
+				(print "Error thrown, exploding groups mountain")
 				(command-s "_ungroup" "NA" "panel_and_tab" "")
+				(command-s "_ungroup" "NA" "first_rot" "")
 			)
 		)
 	)
@@ -73,7 +75,7 @@
 			;(setq p7 (list (car p3) (cadr p2)))
 			;(setq p8 (list (car p1) (cadr p6)))
 			;(setq set1 (ssget "W" p7 p8))
-			(setq ptList (list p1 p2 p3 p4 p1 p3 p5 p6))
+			(setq ptList (list p1 p2 p3 p4 p1 p3 p5 p6 p4))
 			(setq set1 (ssget "F" ptList))
 			(command "_.group" "c" "panel_and_tab" "panel and tab" set1 "")
 		)
@@ -81,20 +83,29 @@
 		(command "_pline" p1 p2 p3 p4 p1 p3 p5 p6 p4 *Cancel*)
 	)
 
+	;make group for everything
+	(setq biggroup (ssadd))
+
 	;rotate the tab
 	(setq firstt 1)
 	(repeat (- n 1)
 		(if (= firstt 1)
 			(progn
 				(command "rotate" (entlast) "" p0 (/ 360.0 n) "")
+				(ssadd (entlast) biggroup)
+				(command "_.group" "c" "first_rot" "first rotation" biggroup "")
 				(setq firstt 0)
 			)
-			(command "rotate" (entlast) "" p0 "C" (/ 360.0 n))
+			(progn
+				(command "rotate" (entlast) "" p0 "C" (/ 360.0 n))
+				(ssadd (entlast) biggroup)
+			)
 		)	
 	)
 
 	;make polygon tab
 	(command "_polygon" n "E" p4 p3)
+	(ssadd (entlast) biggroup)
 
 	(if (= layers "1")
 		(progn
@@ -105,17 +116,22 @@
 			;draw the rest of the outline
 			(command "_line" p2 p3 *Cancel*)
 	 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
+	 		(ssadd (entlast) biggroup)
 	 		(command "_line" p1 p4 *Cancel*)
 	 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
+	 		(ssadd (entlast) biggroup)
 	 		;draw the creases
 			(command "_pline" p2 p1 p3 p4 *Cancel*)
 	 		(command "_change" (entlast) "" "_p" "_la" "creases" "")
+	 		(ssadd (entlast) biggroup)
 	 		(command "_ungroup" "NA" "panel_and_tab")
 		)
 		;finish first panel
-		(command "_pline" p1 p3 p2 p1 p4 *Cancel*)
+		(progn
+			(command "_pline" p1 p3 p2 p1 p4 *Cancel*)
+			(ssadd (entlast) biggroup)
+		)
 	)
-
 
 	(if (= hole "1")
 		(progn
@@ -123,16 +139,25 @@
 			(setq p00 (list (+ (car p3) (* 0.5 b)) (- (cadr p3) apothem)))
 			;draw the circle for the top tab
 			(command "_circle" p0 (/ diameter 2))
+			(ssadd (entlast) biggroup)
 			(if (= layers "1")
 				(command "_change" (entlast) "" "_p" "_la" "outline" "")
 			)
 			;draw the circle for the bottom tab
 			(command "_circle" p00 (/ diameter 2))
+			(ssadd (entlast) biggroup)
 			(if (= layers "1")
 				(command "_change" (entlast) "" "_p" "_la" "outline" "")
 			)
 		)
 	)
-
+	;flip if ccw chirality
+	(if (= chir "ccw")
+		(progn
+			(setq mid (list (+ (car p2) (/ b 2)) (cadr p2)))
+			(command "mirror" biggroup "" p0 mid "Y")
+			(command "_ungroup" "NA" "first_rot")
+		)
+	)
 )
 

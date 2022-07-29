@@ -1,16 +1,18 @@
-(defun drawkreslingpoly (H H0 n b p2 crease_type hole diameter layers / p1 H0sqr Hsqr plusminus minusplus param x1 x2 denom c a g p3 p4 apothem p0 tabwidth j p5 p6 firstt) 
+(defun drawkreslingpoly (H H0 n b p2 crease_type chir hole diameter layers / p1 H0sqr Hsqr plusminus minusplus param x1 x2 denom c a g p3 p4 apothem p0 tabwidth j p5 p6 firstt) 
 
 	(defun *error* (msg)
 		(if (= msg "Function cancelled")
 			(progn
-				(print "Function was canceled, exploding groups")
+				(print "Function was canceled, exploding groups poly")
 				(command-s "_ungroup" "NA" "panel_and_tab" "")
-				(command "_ucs" "W")
+				(command-s "_ungroup" "NA" "first_translation" "")
+				(command-s "_ucs" "W")
 			)
 			(progn
-				(print "Error thrown, exploding groups")
+				(print "Error thrown, exploding groups poly")
 				(command-s "_ungroup" "NA" "panel_and_tab" "")
-				(command "_ucs" "W")
+				(command-s "_ungroup" "NA" "first_translation" "")
+				(command-s "_ucs" "W")
 			)
 		)
 	)
@@ -83,6 +85,9 @@
 		(command "_pline" p1 p8 p7 p2 p3 p5 p6 p4 p3 p1 p2 *Cancel*)
 	)
 
+	;make group for everything
+	(setq biggroup (ssadd))
+
 	;translate the tab 
 	(setq firstt 1)
 	(setq i 0)
@@ -90,6 +95,8 @@
 		(if (= firstt 1)
 			(progn
 				(command "move" (entlast) "" p2 p1 "")
+				(ssadd (entlast) biggroup)
+				(command "_.group" "c" "first_translation" "first translation" biggroup "")
 				(setq firstt 0)
 				(setq i (+ i 1))
 			)
@@ -97,6 +104,7 @@
 				(setq pbase (list (+ (car p2) (* i b)) (cadr p2)))
 				(setq pdisplace (list (+ (car pbase) b) (cadr pbase)))
 				(command "copy" (entlast) "" pbase  pdisplace)
+				(ssadd (entlast) biggroup)
 				;if this is our last time through
 				(if (= i (- n 2))
 					(progn
@@ -118,11 +126,13 @@
 							;add the tab to the outline
 							(command "_change" (entlast) "" "_p" "_la" "outline" "")
 						)
+						(ssadd (entlast) biggroup)
 						(command "_line" newp1tt origin *Cancel*)
 						(if (= layers "1")
 							;last crease
 							(command "_change" (entlast) "" "_p" "_la" "creases" "")
 						)
+						(ssadd (entlast) biggroup)
 						(command "_ucs" "W")
 					)
 				)
@@ -137,7 +147,9 @@
 		;add the tab to the outline
 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
 	)
+	(ssadd (entlast) biggroup)
 	(command "_polygon" n "E" p2 p1 *Cancel*)
+	(ssadd (entlast) biggroup)
 
 	(if (= layers "1")
 		(progn
@@ -149,13 +161,18 @@
 			;draw the last segment of the outline
 			(command "_line" p2 p3 *Cancel*)
 	 		(command "_change" (entlast) "" "_p" "_la" "outline" "")
+	 		(ssadd (entlast) biggroup)
 	 		;draw the creases
 			(command "_pline" p2 p1 p3 p4 *Cancel*)
 	 		(command "_change" (entlast) "" "_p" "_la" "creases" "")
+	 		(ssadd (entlast) biggroup)
 	 		(command "_ungroup" "NA" "panel_and_tab")
 		)
 		;finish the panel
-		(command "_pline" p2 p3 p1 *Cancel*)
+		(progn
+			(command "_pline" p2 p3 p1 *Cancel*)
+			(ssadd (entlast) biggroup)
+		)
 	)
 
 
@@ -169,11 +186,21 @@
 			(if (= layers "1")
 				(command "_change" (entlast) "" "_p" "_la" "outline" "")
 			)
+			(ssadd (entlast) biggroup)
 			;draw the circle for the bottom tab
 			(command "_circle" p00 (/ diameter 2))
 			(if (= layers "1")
 				(command "_change" (entlast) "" "_p" "_la" "outline" "")
 			)
+			(ssadd (entlast) biggroup)
+		)
+	)
+	;flip if ccw chirality
+	(if (= chir "ccw")
+		(progn
+			(setq mid (list (+ (car p2) (/ b 2)) (cadr p2)))
+			(command "mirror" biggroup "" p0 mid "Y")
+			(command "_ungroup" "NA" "first_translation")
 		)
 	)
 )

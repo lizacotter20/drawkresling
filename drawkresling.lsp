@@ -62,15 +62,23 @@
           ;remember which radio button was chosen last time
           (cond
               ((= crease_type_trad nil) (setq crease_type_trad "m"))
-              ((= crease_type_trad "m") (print "mountain") (set_tile "mountain" "1"))
-              ((= crease_type_trad "v") (print "valley") (set_tile "valley" "1")) 
-              ((= crease_type_trad "p") (print "polygon") (set_tile "polygon" "1")) 
+              ((= crease_type_trad "m") (set_tile "mountain" "1"))
+              ((= crease_type_trad "v") (set_tile "valley" "1")) 
+              ((= crease_type_trad "p") (set_tile "polygon" "1")) 
           )
+          ;remember which radio button was chosen last time
+		    (cond
+		        ((= chir_trad nil) (setq chir_trad "cw"))
+		        ((= chir_trad "cw") (set_tile "cw" "1"))
+		        ((= chir_trad "ccw") (set_tile "ccw" "1"))
+		   )
 
           ;radio buttons
           (action_tile "mountain" "(setq crease_type_trad \"m\")")
           (action_tile "valley" "(setq crease_type_trad \"v\")")
           (action_tile "polygon" "(setq crease_type_trad \"p\")")
+          (action_tile "cw" "(setq chir_trad \"cw\")")
+          (action_tile "ccw" "(setq chir_trad \"ccw\")")
 
           ;the diameter edit_box is only enabled when the hole toggle is turned on
           ;(mode_tile "diameter" 1)
@@ -166,9 +174,9 @@
                (setq p2 (list (distof xstrtrad) (distof ystrtrad)))
                ;call drawkresling
                (cond
-               	((= crease_type_trad "m") (drawkreslingmountain H H0 n b p2 crease_type_trad holetrad diameter layerstrad))
-               	((= crease_type_trad "v") (drawkreslingvalley H H0 n b p2 crease_type_trad holetrad diameter layerstrad)) 
-               	((= crease_type_trad "p") (drawkreslingpoly H H0 n b p2 crease_type_trad holetrad diameter layerstrad))
+               	((= crease_type_trad "m") (drawkreslingmountain H H0 n b p2 crease_type_trad chir_trad holetrad diameter layerstrad))
+               	((= crease_type_trad "v") (drawkreslingvalley H H0 n b p2 crease_type_trad chir_trad holetrad diameter layerstrad)) 
+               	((= crease_type_trad "p") (drawkreslingpoly H H0 n b p2 crease_type_trad chir_trad holetrad diameter layerstrad))
                )
                
           )
