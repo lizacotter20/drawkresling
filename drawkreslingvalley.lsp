@@ -54,7 +54,7 @@
 	(setq p6 (list (- (car p4) j) (- (cadr p4) tabwidth)))
 
 	;zoom to drawing area (with lots of margin room)
-	(setq halfwindowside (+ (* 5 apothem) (* -1 (cadr p4))))
+	(setq halfwindowside (+ (- (cadr p2) (cadr p5)) (* 5 apothem)))
 	(setq bottomleft (list (- (car p0) halfwindowside) (- (cadr p0) halfwindowside)))
 	(setq topright (list (+ (car p0) halfwindowside) (+ (cadr p0) halfwindowside)))
 	(command "_zoom" bottomleft topright)
@@ -154,7 +154,7 @@
 		(progn
 			(setq mid (list (+ (car p2) (/ b 2)) (cadr p2)))
 			(command "mirror" biggroup "" p0 mid "Y")
-			(command "_ungroup" "NA" "first_rot")
 		)
 	)
+	(command "_ungroup" "NA" "first_rot")
 )

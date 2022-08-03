@@ -200,8 +200,8 @@
 		(progn
 			(setq mid (list (+ (car p2) (/ b 2)) (cadr p2)))
 			(command "mirror" biggroup "" p0 mid "Y")
-			(command "_ungroup" "NA" "first_translation")
 		)
 	)
+	(command "_ungroup" "NA" "first_translation")
 )
 
