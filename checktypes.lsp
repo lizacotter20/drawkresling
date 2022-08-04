@@ -1,4 +1,4 @@
-(defun checktypes()
+(defun checktypes ( / H0sqr Hsqr plusminus minusplus param)
 	;useful terms to check whether the parameters will be defined
 	(setq H0sqr (expt (/ (distof (get_tile "H0")) (distof (get_tile "b"))) 2))
 	(setq Hsqr (expt (/ (distof (get_tile "H")) (distof (get_tile "b"))) 2))
