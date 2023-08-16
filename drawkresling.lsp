@@ -103,7 +103,7 @@
 		)
 		(action_tile "layers" "(setq layerstrad $value)")
 
-		;in order for the user to be able to press ok, make sure the design constrtradaints are not violated and that the parameter types are correct
+		;in order for the user to be able to press ok, make sure the design constraints are not violated and that the parameter types are correct
 		(action_tile "accept" "(checktypes)")
 
 		;set canceled to true if the dialog was canceled so we dont do unecessary calculations + drawings
@@ -132,6 +132,7 @@
 	(if canceled
 		(setq canceled nil)
 		(progn
+			(print "got in here?")
 			;convert string values to reals or ints
 			(setq H (distof Hstrtrad))
 			(setq H0 (distof H0strtrad))

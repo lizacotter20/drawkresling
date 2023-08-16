@@ -3,7 +3,7 @@
 	(defun *error* (msg)
 		(if (= msg "Function cancelled")
 			(progn
-				(print "Function was canceled, exploding groups mnountain")
+				(print "Function was canceled, exploding groups mountain")
 				(command-s "_ungroup" "NA" "panel_and_tab" "")
 				(command-s "_ungroup" "NA" "first_rot" "")
 			)
